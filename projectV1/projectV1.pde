@@ -1,7 +1,10 @@
 //Version1===================================================================
 //Global Variables-----------------------------------------------------------
 String currentScreen;
+String difficulty;
+
 StartScreen start;
+LevelScreen instructions;
 
 
 void setup(){  
@@ -9,13 +12,16 @@ void setup(){
   
   currentScreen = "start";
   start = new StartScreen();
+  instructions = new LevelScreen();
 }
 
 void draw(){
   if (currentScreen == "start"){
     start.startup();
+  } else if (currentScreen == "levelSelect"){
+    instructions.drawLevels();
   } else {
-    print(currentScreen);
+
   }
 }
 
@@ -27,6 +33,8 @@ void mousePressed(){
  //StartScreen controls
  if (currentScreen == "start"){
   currentScreen = start.handleMouse(mouseX, mouseY);
+ } else if (currentScreen == "levelSelect"){
+   difficulty = instructions.chooseDifficulty();
+   currentScreen = instructions.chooseScreen(mouseX, mouseY);
  }
-  
 }
