@@ -92,6 +92,7 @@ class LevelScreen{
   }
   
   void drawBackButton() {
+    rectMode(CORNER);
     boolean hovering = mouseX > backX && mouseX < backX + backW &&
                        mouseY > backY && mouseY < backY + backH;
   
@@ -117,13 +118,11 @@ class LevelScreen{
   }
 
   String chooseScreen(float x, float y){
-    // Check BACK button first
     if (x > backX && x < backX + backW &&
         y > backY && y < backY + backH) {
       return "start";
     }
-  
-    // Otherwise, continent selection
+    
     if (currentContinent != "") {
       return "mainGameplay"; 
     }

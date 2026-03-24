@@ -4,7 +4,8 @@ String currentScreen;
 String difficulty;
 
 StartScreen start;
-LevelScreen instructions;
+LevelScreen levels;
+TutorialScreen tutorial;
 
 
 void setup(){  
@@ -12,14 +13,17 @@ void setup(){
   
   currentScreen = "start";
   start = new StartScreen();
-  instructions = new LevelScreen();
+  levels = new LevelScreen();
+  tutorial = new TutorialScreen();
 }
 
 void draw(){
   if (currentScreen == "start"){
     start.startup();
   } else if (currentScreen == "levelSelect"){
-    instructions.drawLevels();
+    levels.drawLevels();
+  } else if (currentScreen == "instructions"){
+    tutorial.drawTut();
   } else {
 
   }
@@ -34,7 +38,9 @@ void mousePressed(){
  if (currentScreen == "start"){
   currentScreen = start.handleMouse(mouseX, mouseY);
  } else if (currentScreen == "levelSelect"){
-   difficulty = instructions.chooseDifficulty();
-   currentScreen = instructions.chooseScreen(mouseX, mouseY);
- }
+   difficulty = levels.chooseDifficulty();
+   currentScreen = levels.chooseScreen(mouseX, mouseY);
+ } else if (currentScreen == "instructions"){
+    currentScreen = tutorial.handleMouse(mouseX, mouseY);
+ } 
 }
