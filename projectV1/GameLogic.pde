@@ -23,17 +23,14 @@ String scanSelectedObject() {
   // Check object type and return appropriate scan result
   if (selectedObj.type.equals("virus")) {
     return "Threat detected: virus.";
-  } 
-  else if (selectedObj.type.equals("packet")) {
+  } else if (selectedObj.type.equals("packet")) {
     return "Safe packet detected.";
-  } 
-  else if (selectedObj.type.equals("powerup")) {
+  } else if (selectedObj.type.equals("powerup")) {
 
     // Identify which type of powerup was scanned
     if (selectedObj.powerType.equals("slow")) {
       return "Powerup detected: slow.";
-    } 
-    else if (selectedObj.powerType.equals("blast")) {
+    } else if (selectedObj.powerType.equals("blast")) {
       return "Powerup detected: blast.";
     }
   }
@@ -53,15 +50,15 @@ void burnSelectedObject() {
   // If it's a virus → reward player
   if (selectedObj.type.equals("virus")) {
     virusesBurned++;
-    reputation += 4;
+    reputation = min(100, reputation + 4);
     threatMeter = max(0, threatMeter - 4);
-  } 
+  }
   // If it's a safe packet → penalize player
   else if (selectedObj.type.equals("packet")) {
     packetsBurned++;
-    reputation -= 5;
+    reputation = max(0, reputation - 5);
     serverHealth = max(0, serverHealth - 2);
-  } 
+  }
   // If it's a powerup → activate it instead of destroying
   else if (selectedObj.type.equals("powerup")) {
     activatePowerup(selectedObj);
@@ -92,23 +89,22 @@ void incinerateAllNegativeObjects() {
 
 
 // ================= PASS-TO-SERVER LOGIC =================
-// Handles what happens when an object reaches the server
 void handleObjectReachedServer(NetworkObject obj) {
 
   // Safe packet increases score/reputation
   if (obj.type.equals("packet")) {
     packetsPassed++;
-    reputation += 2;
-  } 
+    reputation = min(100, reputation + 2);
+  }
   // Virus damages server and increases threat
   else if (obj.type.equals("virus")) {
     serverHealth = max(0, serverHealth - 12);
-    reputation -= 6;
+    reputation = max(0, reputation - 6);
     threatMeter += 8;
-  } 
-  // Powerup activates automatically when reaching server
+  }
+  // Powerups do NOTHING when reaching server
   else if (obj.type.equals("powerup")) {
-    activatePowerup(obj);
+    // no effect — must be clicked to activate
   }
 }
 
@@ -123,7 +119,7 @@ void activatePowerup(NetworkObject obj) {
   // Slow powerup reduces object speed for a duration
   if (obj.powerType.equals("slow")) {
     slowTimer = 300; // duration in frames
-  } 
+  }
   // Blast powerup removes all viruses from screen
   else if (obj.powerType.equals("blast")) {
     incinerateAllNegativeObjects();
@@ -139,38 +135,47 @@ void updatePowerupEffects() {
   }
 }
 
-
 // ================= LEVEL WIN / LOSE CONDITIONS =================
 // Checks whether the game should end (win or lose)
 void checkLevelState() {
 
-  // Prevent repeated state changes after game ends
   if (levelEnded) return;
 
-  // Lose condition: server destroyed
   if (serverHealth <= 0) {
     levelEnded = true;
     currentScreen = "end";
     endTitle = "Server Compromised";
     endStory = "Too many threats got through.";
+
+    if (gameplayMusic.isPlaying()) {
+      gameplayMusic.stop();
+    }
     return;
   }
 
-  // Lose condition: reputation too low
   if (reputation <= 0) {
     levelEnded = true;
     currentScreen = "end";
     endTitle = "Trust Lost";
     endStory = "Too many mistakes were made.";
+
+    if (gameplayMusic.isPlaying()) {
+      gameplayMusic.stop();
+    }
     return;
   }
 
-  // Win condition: enough safe packets processed
-  if (packetsPassed >= 15) {
+  if (reputation >= 100) {
+    reputation = 100;
     levelEnded = true;
     currentScreen = "end";
     endTitle = "Level Complete";
-    endStory = "Enough safe traffic reached the server.";
+    endStory = "Your reputation reached 100.";
+
+    if (gameplayMusic.isPlaying()) {
+      gameplayMusic.stop();
+    }
+    return;
   }
 }
 
