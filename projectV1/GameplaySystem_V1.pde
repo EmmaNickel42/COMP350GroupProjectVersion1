@@ -6,8 +6,6 @@
 // - Handles drag-and-drop to scanner / incinerator / server
 // - Draws scanner (progress bar style), incinerator, stats panel, search bar
 // - Calls Nicole's GameplayLogic functions for all game outcomes
-import processing.sound.*;
-SoundFile gameplayMusic;
 ArrayList<NetworkObject> objects;
 NetworkObject selectedObj = null;
 
@@ -80,8 +78,6 @@ void setupGameplaySystem() {
   serverZoneW = 80;            serverZoneH = height * 0.70;
 
   lastSpawnTime = millis();
-  gameplayMusic = new SoundFile(this, "background.mp3");
-  gameplayMusic.loop();
 }
 
 void resetGameplaySystem() {
@@ -100,10 +96,6 @@ void resetGameplaySystem() {
   searchInput   = "";
   searchResult  = "";
   lastSpawnTime = millis();
-  if (gameplayMusic != null && gameplayMusic.isPlaying()) {
-    gameplayMusic.stop();
-  }
-  gameplayMusic.loop();
  }
 
 //  MAIN DRAW 

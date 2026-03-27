@@ -143,38 +143,41 @@ void checkLevelState() {
 
   if (serverHealth <= 0) {
     levelEnded = true;
-    currentScreen = "end";
-    endTitle = "Server Compromised";
-    endStory = "Too many threats got through.";
 
     if (gameplayMusic.isPlaying()) {
       gameplayMusic.stop();
     }
+
+    currentScreen = "end";
+    endTitle = "Server Compromised";
+    endStory = "Too many threats got through.";
     return;
   }
 
   if (reputation <= 0) {
     levelEnded = true;
-    currentScreen = "end";
-    endTitle = "Trust Lost";
-    endStory = "Too many mistakes were made.";
 
     if (gameplayMusic.isPlaying()) {
       gameplayMusic.stop();
     }
+
+    currentScreen = "end";
+    endTitle = "Trust Lost";
+    endStory = "Too many mistakes were made.";
     return;
   }
 
   if (reputation >= 100) {
     reputation = 100;
     levelEnded = true;
-    currentScreen = "end";
-    endTitle = "Level Complete";
-    endStory = "Your reputation reached 100.";
 
     if (gameplayMusic.isPlaying()) {
       gameplayMusic.stop();
     }
+
+    currentScreen = "end";
+    endTitle = "Level Complete";
+    endStory = "Your reputation reached 100.";
     return;
   }
 }

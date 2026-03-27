@@ -1,3 +1,5 @@
+import processing.sound.*;
+
 //Version1===================================================================
 //Global Variables-----------------------------------------------------------
 String currentScreen;
@@ -7,66 +9,83 @@ StartScreen start;
 LevelScreen levels;
 TutorialScreen tutorial;
 
+// sound
+SoundFile whooshSfx;
+SoundFile gameplayMusic;
 
-void setup(){  
+void setup() {
   size(800, 600);
-  
+
   currentScreen = "start";
   start = new StartScreen();
   levels = new LevelScreen();
   tutorial = new TutorialScreen();
   setupGameplaySystem();
+
+  // load sounds from data folder
+  whooshSfx = new SoundFile(this, "whoosh.mp3");
+  gameplayMusic = new SoundFile(this, "gameplaymusic.mp3");
 }
 
-void draw(){
-  if (currentScreen == "start"){
+void draw() {
+  if (currentScreen.equals("start")) {
     start.startup();
-  } else if (currentScreen == "levelSelect"){
+  } else if (currentScreen.equals("levelSelect")) {
     levels.drawLevels();
-  } else if (currentScreen == "instructions"){
+  } else if (currentScreen.equals("instructions")) {
     tutorial.drawTut();
-  } else if (currentScreen.equals("mainGameplay")) { 
+  } else if (currentScreen.equals("mainGameplay")) {
     drawGameplay();
-  }else {
-
-  }
+  } 
 }
 
 //Interactions---------------------------------------------------------------
 
-void mousePressed(){
-  // Utility mouse function -------------------------------------------------
- print("( "+ mouseX + ", "+ mouseY + ") ");
- //StartScreen controls
- if (currentScreen == "start"){
-  currentScreen = start.handleMouse(mouseX, mouseY);
- } else if (currentScreen == "levelSelect"){
-   difficulty = levels.chooseDifficulty();
-   String next = levels.chooseScreen(mouseX, mouseY);
-   if (next.equals("mainGameplay")) {
-      resetGameplaySystem();     
+void mousePressed() {
+  print("( "+ mouseX + ", "+ mouseY + ") ");
+
+  if (currentScreen.equals("start")) {
+    String next = start.handleMouse(mouseX, mouseY);
+
+    // play whoosh only when leaving start screen for level select
+    if (next.equals("levelSelect")) {
+      whooshSfx.play();
     }
+
     currentScreen = next;
- } else if (currentScreen == "instructions"){
+  } else if (currentScreen.equals("levelSelect")) {
+    difficulty = levels.chooseDifficulty();
+    String next = levels.chooseScreen(mouseX, mouseY);
+
+    if (next.equals("mainGameplay")) {
+      resetGameplaySystem();
+
+      if (!gameplayMusic.isPlaying()) {
+        gameplayMusic.loop();
+      }
+    }
+
+    currentScreen = next;
+  } else if (currentScreen.equals("instructions")) {
     currentScreen = tutorial.handleMouse(mouseX, mouseY);
- } else if (currentScreen.equals("mainGameplay")) {  
+  } else if (currentScreen.equals("mainGameplay")) {
     gameMousePressed();
   }
 }
 
-void mouseDragged() {                                 
+void mouseDragged() {
   if (currentScreen.equals("mainGameplay")) {
     gameDragged();
   }
 }
 
-void mouseReleased() {                                
+void mouseReleased() {
   if (currentScreen.equals("mainGameplay")) {
     gameReleased();
   }
 }
 
-void keyPressed() {                                  
+void keyPressed() {
   if (currentScreen.equals("mainGameplay")) {
     gameKeyPressed();
   }
