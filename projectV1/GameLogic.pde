@@ -183,8 +183,8 @@ void checkLevelState() {
 }
 
 
-// ================= SEARCH FUNCTION =================
-// Checks if there are any virus objects currently on screen
+// ================= HELPER SEARCH FUNCTION =================
+// Quickly checks if any virus exists on screen (used for gameplay logic)
 boolean hasVirusOnScreen() {
 
   for (int i = 0; i < objects.size(); i++) {
