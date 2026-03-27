@@ -115,6 +115,8 @@ void activatePowerup(NetworkObject obj) {
 
   // Safety check
   if (!obj.type.equals("powerup")) return;
+  
+  powerupsUsed = powerupsUsed+1;
 
   // Slow powerup reduces object speed for a duration
   if (obj.powerType.equals("slow")) {

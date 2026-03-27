@@ -1,6 +1,6 @@
 class EndScreen {
   
-  void drawEnd(String result, int packetsPassed, int virusesBurned, int packetsBurned, String continent, String difficulty){
+  void drawEnd(String result, int packetsPassed, int virusesBurned, int packetsBurned, String continent, String difficulty, int powerupsUsed, int serverHealth){
     background(255);
     
     if (result == "win"){
@@ -55,8 +55,8 @@ class EndScreen {
     text("Packets Burned", 300, 260);
     text("Continent", 300, 300);
     text("Difficulty", 300, 340);
-    text("Stat7", 300, 380);
-    text("Stat8", 300, 420);
+    text("Powerups Used", 300, 380);
+    text("Remaining Health", 300, 420);
     
     text("Results", 500, 140);
     text(packetsPassed, 500, 180);
@@ -64,8 +64,8 @@ class EndScreen {
     text(packetsBurned, 500, 260);
     text(continent, 500, 300);
     text(difficulty, 500, 340);
-    text("Result7", 500, 380);
-    text("Result8", 500, 420);
+    text(powerupsUsed, 500, 380);
+    text(serverHealth, 500, 420);
       
     //Buttons
     stroke(0,76, 153);

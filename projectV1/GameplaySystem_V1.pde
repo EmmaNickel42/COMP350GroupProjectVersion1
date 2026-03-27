@@ -17,6 +17,7 @@ int slowTimer     = 0;
 int packetsPassed = 0;
 int virusesBurned = 0;
 int packetsBurned = 0;
+int powerupsUsed = 0;
 
 boolean levelEnded = false;
 String endTitle    = "";

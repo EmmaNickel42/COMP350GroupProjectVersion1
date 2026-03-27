@@ -39,7 +39,7 @@ void draw() {
   } else if (currentScreen.equals("mainGameplay")) {
     drawGameplay();
   } else if (currentScreen.equals("end")) {
-    end.drawEnd(endTitle, packetsPassed, virusesBurned, packetsBurned, levels.getContinent(), difficulty);
+    end.drawEnd(endTitle, packetsPassed, virusesBurned, packetsBurned, levels.getContinent(), difficulty, powerupsUsed, serverHealth);
   } else {
   }
 }
