@@ -36,7 +36,8 @@ void draw() {
     tutorial.drawTut();
   } else if (currentScreen.equals("mainGameplay")) {
     drawGameplay();
-  } 
+  } else {
+  }
 }
 
 //Interactions---------------------------------------------------------------
