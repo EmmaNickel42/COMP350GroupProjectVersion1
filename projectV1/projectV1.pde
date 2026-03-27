@@ -76,7 +76,12 @@ void mousePressed() {
   } else if (currentScreen.equals("mainGameplay")) {
     gameMousePressed();
   } else if (currentScreen.equals("end")) {
-    currentScreen = end.handleMouse(mouseX, mouseY);
+     String next = end.handleMouse(mouseX, mouseY);
+     if (next.equals("mainGameplay")) {
+      resetGameplaySystem();
+      gameplayMusic.loop();
+     }
+     currentScreen = next;
   }
 }
 
