@@ -149,7 +149,7 @@ void checkLevelState() {
     }
 
     currentScreen = "end";
-    endTitle = "Server Compromised";
+    endTitle = "lose";
     endStory = "Too many threats got through.";
     return;
   }
@@ -162,7 +162,7 @@ void checkLevelState() {
     }
 
     currentScreen = "end";
-    endTitle = "Trust Lost";
+    endTitle = "lose";
     endStory = "Too many mistakes were made.";
     return;
   }
@@ -176,7 +176,7 @@ void checkLevelState() {
     }
 
     currentScreen = "end";
-    endTitle = "Level Complete";
+    endTitle = "win";
     endStory = "Your reputation reached 100.";
     return;
   }

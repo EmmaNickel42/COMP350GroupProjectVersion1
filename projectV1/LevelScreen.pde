@@ -19,6 +19,10 @@ class LevelScreen{
     map = loadImage("mapV1.png");
   }
   
+  String getContinent(){
+    return currentContinent;
+  }
+  
   void drawLevels(){
      image(map, 0, 0, width, height);
 
