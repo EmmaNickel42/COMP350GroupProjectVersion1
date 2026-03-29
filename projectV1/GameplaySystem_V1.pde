@@ -19,9 +19,10 @@ int virusesBurned = 0;
 int packetsBurned = 0;
 int powerupsUsed  = 0;
 
+String endTitle   = "";
+String endStory   = "";
+
 boolean levelEnded = false;
-String endTitle    = ""; 
-String endStory    = "";
 
 float[] trackedX = new float[10];
 float[] trackedY = new float[10];
@@ -41,24 +42,26 @@ PImage imgIncinerator, imgHealth, imgDial;
 
 int lastSpawnTime     = 0;
 int baseSpawnInterval = 2500;
+
 // DRAG
 float dragOffsetX = 0;
 float dragOffsetY = 0;
+
 // SCANNER
 float   scannerX, scannerY, scannerW, scannerH;
 boolean isScanning    = false;
 int     scanStartTime = 0;
 int     scanDuration  = 3000;
+
 // INCINERATOR
 float   incinX, incinY, incinW, incinH;
 boolean showIncinEffect  = false;
 int     incinEffectStart = 0;
 int     incinEffectDur   = 800;
+
 // SERVER ZONE
 float serverZoneX, serverZoneY, serverZoneW, serverZoneH;
-// SEARCH BAR
-String searchInput  = "";
-String searchResult = "";
+
 // FILE OUTPUT - Requirement 2.2
 PrintWriter movementLog;
 // INTERFACE 
@@ -105,6 +108,7 @@ abstract class GameEntity implements Scannable, Displayable {
   abstract void display();
   abstract boolean isMouseOver();
 }
+
 // PARENT CLASS 
 class NetworkObject extends GameEntity {
   String type;
@@ -163,6 +167,7 @@ class NetworkObject extends GameEntity {
            mouseY>y-h/2 && mouseY<y+h/2;
   }
 }
+
 // CHILD CLASS 
 class VirusObject extends NetworkObject {
   int threatMultiplier;
@@ -187,6 +192,7 @@ class VirusObject extends NetworkObject {
     }
   }
 }
+
 // SETUP 
 void setupGameplaySystem() {
   objects   = new ArrayList<NetworkObject>();
@@ -218,6 +224,7 @@ void setupGameplaySystem() {
   lastSpawnTime = millis();
   gameState     = STATE_SPAWNING;
 }
+
 // RESET 
 void resetGameplaySystem() {
   objects.clear();
@@ -234,12 +241,11 @@ void resetGameplaySystem() {
   levelEnded      = false;
   isScanning      = false;
   showIncinEffect = false;
-  searchInput     = "";
-  searchResult    = "";
   trackIndex      = 0;
   lastSpawnTime   = millis();
   gameState       = STATE_SPAWNING;
 }
+
 // FINITE STATE MACHINE 
 void updateFSM() {
   switch (gameState) {
@@ -260,6 +266,7 @@ void updateFSM() {
       break;
   }
 }
+
 // MAIN DRAW 
 void drawGameplay() {
   background(10, 20, 40);
@@ -303,9 +310,9 @@ void drawGameplay() {
   drawScannerAndIncinerator();
   if (showIncinEffect) drawIncinEffect();
   drawStatsPanel();
-  drawSearchBar();
   drawFSMState();
 }
+
 // SPAWNING
 void spawnObject() {
   float  roll   = random(1);
@@ -339,6 +346,7 @@ int getSpawnInterval() {
   }
   return max(600, base - threatMeter*12);
 }
+
 // FILE I/O 
 void logObjectPosition(NetworkObject obj) {
   if (movementLog != null) {
@@ -347,6 +355,7 @@ void logObjectPosition(NetworkObject obj) {
     movementLog.flush();
   }
 }
+
 // SORT with WHILE LOOP 
 // Sorts tracked X positions highest to lowest
 float[] getSortedTrackedX() {
@@ -366,6 +375,7 @@ float[] getSortedTrackedX() {
   }
   return sorted;
 }
+
 // MOUSE INTERACTION
 void gameMousePressed() {
   for (int i=objects.size()-1; i>=0; i--) {
@@ -390,6 +400,9 @@ void gameMousePressed() {
       return;
     }
   }
+}
+
+void gameKeyPressed() {
 }
 
 void gameDragged() {
@@ -435,16 +448,6 @@ void gameReleased() {
   }
 }
 
-void gameKeyPressed() {
-  if (key==BACKSPACE && searchInput.length()>0) {
-    searchInput  = searchInput.substring(0, searchInput.length()-1);
-    searchResult = "";
-  } else if (key==ENTER) {
-    searchResult = searchByID(searchInput);
-  } else if (key!=CODED && searchInput.length()<12) {
-    searchInput += key;
-  }
-}
 // SCAN COMPLETION
 void checkScanComplete() {
   if (!isScanning || selectedObj==null) return;
@@ -457,24 +460,6 @@ void checkScanComplete() {
     selectedObj = null;
   }
 }
-// SEARCH
-String searchByID(String query) {
-  // Search active objects
-  for (NetworkObject obj : objects) {
-    if (obj.id.equalsIgnoreCase(query)) {
-      if (obj.scanned) {
-        return obj.id + (obj.isSafeObject() ? " -> Safe" : " -> Unsafe");
-      } else {
-        return obj.id + " -> Not verified";
-      }
-    }
-  }
-  // Search scan stack
-  for (NetworkObject obj : scanStack) {
-    if (obj.id.equalsIgnoreCase(query)) return obj.id+" (in scanner)";
-  }
-  return "ID not found.";
-}
 
 void drawFSMState() {
   String[] names  = {"SPAWNING","SCANNING","SLOWDOWN","GAME OVER"};
@@ -483,6 +468,7 @@ void drawFSMState() {
   fill(colors[gameState]); noStroke(); textSize(10); textAlign(LEFT,TOP);
   text("STATE: "+names[gameState], 10, height*0.10);
 }
+
 // SERVER ZONE
 void drawServerZone() {
   stroke(0,200,100); strokeWeight(2); noFill();
@@ -490,6 +476,7 @@ void drawServerZone() {
   fill(0,200,100); noStroke(); textSize(11); textAlign(CENTER,TOP);
   text("SERVER", serverZoneX+serverZoneW/2, serverZoneY+4);
 }
+
 // SCANNER + INCINERATOR (V1 progress bar style)
 void drawScannerAndIncinerator() {
   checkScanComplete();
@@ -521,6 +508,7 @@ void drawScannerAndIncinerator() {
   fill(255,140,0); noStroke(); textSize(10); textAlign(CENTER,BOTTOM);
   text("INCINERATOR", incinX+incinW/2, incinY+incinH-3);
 }
+
 // BLAST EFFECT
 void drawIncinEffect() {
   int e = millis()-incinEffectStart;
@@ -530,6 +518,7 @@ void drawIncinEffect() {
   image(imgIncinerator, width/2-80, height/2-80, 160, 160);
   noTint();
 }
+
 // STATS PANEL + LIVE THREAT DIAL (V1 bar graph style)
 void drawStatsPanel() {
   float px=10, py=height*0.15, pw=160, ph=270;
@@ -579,39 +568,7 @@ void drawThreatDial(float cx, float cy, float r) {
   fill(180); textSize(8); textAlign(CENTER,TOP);
   text("THREAT", cx, cy+r+2);
 }
-// SEARCH BAR
-void drawSearchBar() {
-  float bx = scannerX - 165;
-  float by = scannerY + 5;
-  float bw = 150, bh = 24;
 
-  // Label above search bar
-  fill(160, 220, 255);
-  noStroke();
-  textSize(10);
-  textAlign(LEFT, TOP);
-  text("Type packet ID (e.g. PKT-4821) + press ENTER", bx, by - 14);
-
-  // Input box
-  fill(20, 30, 50);
-  stroke(0, 160, 220);
-  strokeWeight(1);
-  rect(bx, by, bw, bh, 4);
-
-  fill(200, 230, 255);
-  noStroke();
-  textSize(11);
-  textAlign(LEFT, CENTER);
-  text(searchInput.length() > 0 ? searchInput : "Search ID...", bx + 6, by + bh / 2);
-
-  // Result line below box
-  if (searchResult.length() > 0) {
-    fill(160, 220, 255);
-    textSize(10);
-    textAlign(LEFT, TOP);
-    text(searchResult, bx, by + bh + 5);
-  }
-}
 // HELPER
 boolean isInZone(float px, float py,
                  float zx, float zy, float zw, float zh) {
