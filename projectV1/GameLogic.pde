@@ -12,22 +12,23 @@
 // Determines what kind of object is selected and returns a message
 String scanSelectedObject() {
 
-  // If nothing is selected, return a default message
   if (selectedObj == null) {
     return "No object selected.";
   }
 
-  // Mark object as scanned (if this field exists in NetworkObject)
   selectedObj.scanned = true;
 
-  // Check object type and return appropriate scan result
   if (selectedObj.type.equals("virus")) {
     return "Threat detected: virus.";
-  } else if (selectedObj.type.equals("packet")) {
-    return "Safe packet detected.";
-  } else if (selectedObj.type.equals("powerup")) {
-
-    // Identify which type of powerup was scanned
+  } 
+  else if (selectedObj.type.equals("packet")) {
+    if (selectedObj.isSafe) {
+      return "Safe packet detected.";
+    } else {
+      return "Unsafe packet detected.";
+    }
+  } 
+  else if (selectedObj.type.equals("powerup")) {
     if (selectedObj.powerType.equals("slow")) {
       return "Powerup detected: slow.";
     } else if (selectedObj.powerType.equals("blast")) {
@@ -35,7 +36,6 @@ String scanSelectedObject() {
     }
   }
 
-  // Fallback if object type is unknown
   return "Unknown object.";
 }
 
@@ -44,27 +44,30 @@ String scanSelectedObject() {
 // Handles what happens when the player burns a selected object
 void burnSelectedObject() {
 
-  // Do nothing if no object is selected
   if (selectedObj == null) return;
 
-  // If it's a virus → reward player
   if (selectedObj.type.equals("virus")) {
     virusesBurned++;
     reputation = min(100, reputation + 4);
     threatMeter = max(0, threatMeter - 4);
   }
-  // If it's a safe packet → penalize player
   else if (selectedObj.type.equals("packet")) {
     packetsBurned++;
-    reputation = max(0, reputation - 5);
-    serverHealth = max(0, serverHealth - 2);
+
+    if (selectedObj.isSafe) {
+      // bad mistake: burned a good packet
+      reputation = max(0, reputation - 5);
+      serverHealth = max(0, serverHealth - 2);
+    } else {
+      // good decision: burned an unsafe packet
+      reputation = min(100, reputation + 3);
+      threatMeter = max(0, threatMeter - 3);
+    }
   }
-  // If it's a powerup → activate it instead of destroying
   else if (selectedObj.type.equals("powerup")) {
     activatePowerup(selectedObj);
   }
 
-  // Remove the object from the game after action
   objects.remove(selectedObj);
   selectedObj = null;
 }
@@ -91,20 +94,24 @@ void incinerateAllNegativeObjects() {
 // ================= PASS-TO-SERVER LOGIC =================
 void handleObjectReachedServer(NetworkObject obj) {
 
-  // Safe packet increases score/reputation
   if (obj.type.equals("packet")) {
     packetsPassed++;
-    reputation = min(100, reputation + 2);
+
+    if (obj.isSafe) {
+      reputation = min(100, reputation + 2);
+    } else {
+      serverHealth = max(0, serverHealth - 8);
+      reputation = max(0, reputation - 4);
+      threatMeter += 5;
+    }
   }
-  // Virus damages server and increases threat
   else if (obj.type.equals("virus")) {
     serverHealth = max(0, serverHealth - 12);
     reputation = max(0, reputation - 6);
     threatMeter += 8;
   }
-  // Powerups do NOTHING when reaching server
   else if (obj.type.equals("powerup")) {
-    // no effect — must be clicked to activate
+    // no effect
   }
 }
 
@@ -260,13 +267,13 @@ String[] getSortedStatLines() {
   }
 
   String[] lines = new String[7];
-  lines[0] = "Sorted Stats (High to Low)";
+  lines[0] = "Sorted Gameplay Results (High to Low)";
   lines[1] = "1. " + labels[0] + ": " + nf(stats[0], 0, 0);
   lines[2] = "2. " + labels[1] + ": " + nf(stats[1], 0, 0);
   lines[3] = "3. " + labels[2] + ": " + nf(stats[2], 0, 0);
   lines[4] = "";
-  lines[5] = "Viruses currently on screen at export: " + countVirusesOnScreen();
-  lines[6] = "Virus present on screen: " + hasVirusOnScreen();
+  lines[5] = "Packets Burned: " + packetsBurned;
+  lines[6] = "Viruses Burned: " + virusesBurned;
 
   return lines;
 }
