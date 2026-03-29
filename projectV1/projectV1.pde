@@ -3,7 +3,7 @@ import processing.sound.*;
 //Version1===================================================================
 //Global Variables-----------------------------------------------------------
 String currentScreen;
-String difficulty;
+String difficulty; 
 
 StartScreen start;
 LevelScreen levels;
