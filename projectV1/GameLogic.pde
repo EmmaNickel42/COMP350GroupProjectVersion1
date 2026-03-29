@@ -20,15 +20,13 @@ String scanSelectedObject() {
 
   if (selectedObj.type.equals("virus")) {
     return "Threat detected: virus.";
-  } 
-  else if (selectedObj.type.equals("packet")) {
+  } else if (selectedObj.type.equals("packet")) {
     if (selectedObj.isSafe) {
       return "Safe packet detected.";
     } else {
       return "Unsafe packet detected.";
     }
-  } 
-  else if (selectedObj.type.equals("powerup")) {
+  } else if (selectedObj.type.equals("powerup")) {
     if (selectedObj.powerType.equals("slow")) {
       return "Powerup detected: slow.";
     } else if (selectedObj.powerType.equals("blast")) {
@@ -50,8 +48,7 @@ void burnSelectedObject() {
     virusesBurned++;
     reputation = min(100, reputation + 4);
     threatMeter = max(0, threatMeter - 4);
-  }
-  else if (selectedObj.type.equals("packet")) {
+  } else if (selectedObj.type.equals("packet")) {
     packetsBurned++;
 
     if (selectedObj.isSafe) {
@@ -63,8 +60,7 @@ void burnSelectedObject() {
       reputation = min(100, reputation + 3);
       threatMeter = max(0, threatMeter - 3);
     }
-  }
-  else if (selectedObj.type.equals("powerup")) {
+  } else if (selectedObj.type.equals("powerup")) {
     activatePowerup(selectedObj);
   }
 
@@ -104,13 +100,11 @@ void handleObjectReachedServer(NetworkObject obj) {
       reputation = max(0, reputation - 4);
       threatMeter += 5;
     }
-  }
-  else if (obj.type.equals("virus")) {
+  } else if (obj.type.equals("virus")) {
     serverHealth = max(0, serverHealth - 12);
     reputation = max(0, reputation - 6);
     threatMeter += 8;
-  }
-  else if (obj.type.equals("powerup")) {
+  } else if (obj.type.equals("powerup")) {
     // no effect
   }
 }
@@ -122,7 +116,7 @@ void activatePowerup(NetworkObject obj) {
 
   // Safety check
   if (!obj.type.equals("powerup")) return;
-  
+
   powerupsUsed = powerupsUsed+1;
 
   // Slow powerup reduces object speed for a duration
@@ -156,7 +150,7 @@ void checkLevelState() {
     if (gameplayMusic.isPlaying()) {
       gameplayMusic.stop();
     }
-    
+
     exportSortedStatsToFile();
 
     currentScreen = "end";
@@ -171,7 +165,7 @@ void checkLevelState() {
     if (gameplayMusic.isPlaying()) {
       gameplayMusic.stop();
     }
-    
+
     exportSortedStatsToFile();
 
     currentScreen = "end";
@@ -187,7 +181,7 @@ void checkLevelState() {
     if (gameplayMusic.isPlaying()) {
       gameplayMusic.stop();
     }
-    
+
     exportSortedStatsToFile();
 
     currentScreen = "end";
@@ -266,14 +260,14 @@ String[] getSortedStatLines() {
     }
   }
 
-  String[] lines = new String[7];
+  String[] lines = new String[6];
+
   lines[0] = "Sorted Gameplay Results (High to Low)";
   lines[1] = "1. " + labels[0] + ": " + nf(stats[0], 0, 0);
   lines[2] = "2. " + labels[1] + ": " + nf(stats[1], 0, 0);
   lines[3] = "3. " + labels[2] + ": " + nf(stats[2], 0, 0);
-  lines[4] = "";
-  lines[5] = "Packets Burned: " + packetsBurned;
-  lines[6] = "Viruses Burned: " + virusesBurned;
+  lines[4] = "4. Packets Burned: " + packetsBurned;
+  lines[5] = "5. Viruses Burned: " + virusesBurned;
 
   return lines;
 }
