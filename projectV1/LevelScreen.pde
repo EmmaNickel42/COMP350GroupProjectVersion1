@@ -1,4 +1,4 @@
-class LevelScreen{
+class LevelScreen {
   PImage map;
 
   color NORTH_AMERICA = color(234, 85, 69);
@@ -9,46 +9,53 @@ class LevelScreen{
   color AUSTRALIA     = color(64, 158, 97);
 
   String currentContinent = "";
-  
+
   float backX = 10;
   float backY = 10;
   float backW = 100;
   float backH = 40;
-  
+
   LevelScreen() {
     map = loadImage("mapV1.png");
   }
-  
-  String getContinent(){
+
+  String getContinent() {
     return currentContinent;
   }
-  
-  void drawLevels(){
-     image(map, 0, 0, width, height);
 
-    color c = get(mouseX, mouseY);
+  void drawLevels() {
+    image(map, 0, 0, width, height);
+
+    // Convert mouse position on screen to pixel position in original image
+    int imgX = int(map(mouseX, 0, width, 0, map.width));
+    int imgY = int(map(mouseY, 0, height, 0, map.height));
+
+    imgX = constrain(imgX, 0, map.width - 1);
+    imgY = constrain(imgY, 0, map.height - 1);
+
+    // Read color from original image, not screen
+    color c = map.get(imgX, imgY);
 
     currentContinent = detectContinent(c);
-    
+
     drawBackButton();
 
-    if (currentContinent != "") {
+    if (!currentContinent.equals("")) {
       drawTooltip(mouseX, mouseY, currentContinent);
     }
   }
-  
-   String detectContinent(color c) {
+
+  String detectContinent(color c) {
     if (isClose(c, NORTH_AMERICA)) return "North America";
     if (isClose(c, SOUTH_AMERICA)) return "South America";
     if (isClose(c, EUROPE)) return "Europe";
     if (isClose(c, AFRICA)) return "Africa";
     if (isClose(c, ASIA)) return "Asia";
-    if (isCloseCustom(c, AUSTRALIA, 35)) return "Australia"; 
-    //Australia was trickier to detect for some reason so needed higher tolerance.
+    if (isCloseCustom(c, AUSTRALIA, 35)) return "Australia";
 
     return "";
   }
-  
+
   boolean isClose(color c1, color c2) {
     float r1 = red(c1), g1 = green(c1), b1 = blue(c1);
     float r2 = red(c2), g2 = green(c2), b2 = blue(c2);
@@ -59,13 +66,13 @@ class LevelScreen{
            abs(g1 - g2) < tolerance &&
            abs(b1 - b2) < tolerance;
   }
-  
+
   boolean isCloseCustom(color c1, color c2, float tolerance) {
     return abs(red(c1) - red(c2)) < tolerance &&
            abs(green(c1) - green(c2)) < tolerance &&
            abs(blue(c1) - blue(c2)) < tolerance;
   }
-  
+
   void drawTooltip(float x, float y, String continent) {
     String difficulty = getDifficulty(continent);
 
@@ -83,8 +90,8 @@ class LevelScreen{
     textSize(12);
     text("Difficulty: " + difficulty, x + 20, y + 45);
   }
-  
-    String getDifficulty(String continent) {
+
+  String getDifficulty(String continent) {
     if (continent.equals("North America")) return "Easy";
     if (continent.equals("South America")) return "Medium";
     if (continent.equals("Europe")) return "Medium";
@@ -94,43 +101,43 @@ class LevelScreen{
 
     return "";
   }
-  
+
   void drawBackButton() {
     rectMode(CORNER);
     boolean hovering = mouseX > backX && mouseX < backX + backW &&
                        mouseY > backY && mouseY < backY + backH;
-  
+
     if (hovering) {
       fill(80);
     } else {
       fill(40);
     }
-  
+
     stroke(255);
     rect(backX, backY, backW, backH, 8);
-  
+
     fill(255);
     textSize(14);
     textAlign(CENTER, CENTER);
-    text("← Back", backX + backW/2, backY + backH/2);
-  
+    text("← Back", backX + backW / 2, backY + backH / 2);
+
     textAlign(LEFT, BASELINE);
   }
-  
-  String chooseDifficulty(){
+
+  String chooseDifficulty() {
     return getDifficulty(currentContinent);
   }
 
-  String chooseScreen(float x, float y){
+  String chooseScreen(float x, float y) {
     if (x > backX && x < backX + backW &&
         y > backY && y < backY + backH) {
       return "start";
     }
-    
-    if (currentContinent != "") {
-      return "mainGameplay"; 
+
+    if (!currentContinent.equals("")) {
+      return "mainGameplay";
     }
-  
+
     return "levelSelect";
   }
 }

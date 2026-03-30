@@ -1,5 +1,5 @@
-// GameplaySystem.pde - Version 1 (Data-Driven Dashboard)
-
+// GameplaySystem.pde - Version 1 
+// FSM states
 final int STATE_SPAWNING = 0;
 final int STATE_SCANNING = 1;
 final int STATE_SLOWDOWN = 2;
@@ -24,10 +24,12 @@ String endStory   = "";
 
 boolean levelEnded = false;
 
+// Static array[] — movement tracking
 float[] trackedX = new float[10];
 float[] trackedY = new float[10];
 int trackIndex   = 0;
 
+// Stack push/pop — scan history
 ArrayList<NetworkObject> scanStack = new ArrayList<NetworkObject>();
 
 void stackPush(NetworkObject obj) {
@@ -64,9 +66,10 @@ int     incinEffectDur   = 800;
 // SERVER ZONE
 float serverZoneX, serverZoneY, serverZoneW, serverZoneH;
 
-// FILE OUTPUT - Requirement 2.2
+// File output
 PrintWriter movementLog;
-// INTERFACE
+
+// Interfaces
 interface Scannable {
   String getScanResult();
   boolean isSafeObject();
@@ -77,6 +80,7 @@ interface Displayable {
   boolean isMouseOver();
 }
 
+// Abstract class (Grandparent) — uses noise() and random()
 abstract class GameEntity implements Scannable, Displayable {
   float x, y, speed, w, h;
   String id;
@@ -93,7 +97,7 @@ abstract class GameEntity implements Scannable, Displayable {
   void move(float speedMult) {
     x += speed * speedMult;
     if (frameCount % 10 == 0) {
-      y += (noise(x * 0.01, y * 0.01) - 0.5) * 1.5;
+      y += (noise(x * 0.01, y * 0.01) - 0.5) * 1.5; // noise()
     }
   }
 
@@ -117,7 +121,7 @@ abstract class GameEntity implements Scannable, Displayable {
   abstract boolean isMouseOver();
 }
 
-// PARENT CLASS
+// Parent class (level 2 of 3)
 class NetworkObject extends GameEntity {
   String type;
   String powerType;
@@ -153,7 +157,7 @@ class NetworkObject extends GameEntity {
   }
 
   void display() {
-    pushMatrix();
+    pushMatrix(); // pushMatrix/popMatrix for 2D transformation
     translate(x, y);
 
     if (type.equals("packet")) drawPacket();
@@ -202,7 +206,7 @@ class NetworkObject extends GameEntity {
   }
 }
 
-// CHILD CLASS
+// Child class (level 3 of 3) — GameEntity -> NetworkObject -> VirusObject
 class VirusObject extends NetworkObject {
   int threatMultiplier;
 
@@ -293,7 +297,7 @@ void resetGameplaySystem() {
   gameState       = STATE_SPAWNING;
 }
 
-// FINITE STATE MACHINE
+// Finite State Machine — 4 states using switch
 void updateFSM() {
   switch (gameState) {
   case STATE_SPAWNING:
@@ -396,7 +400,7 @@ int getSpawnInterval() {
   return max(600, base - threatMeter*12);
 }
 
-// FILE I/O
+// External file output — writes to movement_log.txt
 void logObjectPosition(NetworkObject obj) {
   if (movementLog != null) {
     movementLog.println(obj.id+","+nf(obj.x, 1, 1)+","+
@@ -405,12 +409,11 @@ void logObjectPosition(NetworkObject obj) {
   }
 }
 
-// SORT with WHILE LOOP
-// Sorts tracked X positions highest to lowest
+// Sort algorithm + while loop — bubble sort on tracked positions
 float[] getSortedTrackedX() {
   float[] sorted = trackedX.clone(); // static array
   int i = 0;
-  while (i < sorted.length - 1) {   // while loop
+  while (i < sorted.length - 1) { // while loop
     int j = 0;
     while (j < sorted.length - 1 - i) {
       if (sorted[j] < sorted[j+1]) {
@@ -425,13 +428,13 @@ float[] getSortedTrackedX() {
   return sorted;
 }
 
-// MOUSE INTERACTION
+// Mouse interaction
 void gameMousePressed() {
   if (isScanning) {
     return;
   }
 
-  for (int i = objects.size() - 1; i >= 0; i--) {
+  for (int i = objects.size() - 1; i >= 0; i--) { // for loop
     NetworkObject obj = objects.get(i);
     if (obj.isMouseOver()) {
       if (obj.type.equals("powerup")) {
@@ -475,7 +478,7 @@ void gameReleased() {
       scanStartTime = millis();
       selectedObj.x = scannerX + scannerW / 2;
       selectedObj.y = scannerY + scannerH / 2;
-      stackPush(selectedObj);
+      stackPush(selectedObj); // stack push
       return;
     }
   } 
@@ -509,7 +512,7 @@ void checkScanComplete() {
     selectedObj.scanResult = result;
     selectedObj.showScanResult = true;
 
-    stackPop();        // remove from scanner stack
+    stackPop(); // stack pop
     isScanning = false;
     selectedObj = null;
   }
