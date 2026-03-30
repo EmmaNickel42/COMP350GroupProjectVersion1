@@ -153,24 +153,29 @@ class NetworkObject extends GameEntity {
   }
 
   void display() {
+    pushMatrix();
+    translate(x, y);
+
     if (type.equals("packet")) drawPacket();
-    else if (img != null) image(img, x-w/2, y-h/2, w, h);
+    else if (img != null) image(img, -w/2, -h/2, w, h);
 
     if (this == selectedObj) {
       noFill();
       stroke(255, 255, 0);
       strokeWeight(2);
-      rect(x-w/2-3, y-h/2-3, w+6, h+6, 4);
+      rect(-w/2-3, -h/2-3, w+6, h+6, 4);
     }
     if (showScanResult) {
       fill(isSafeObject() ? color(0, 200, 80, 200) : color(220, 30, 30, 200));
       noStroke();
-      ellipse(x+w/2, y-h/2, 16, 16);
+      ellipse(w/2, -h/2, 16, 16);
       fill(255);
       textSize(9);
       textAlign(CENTER, CENTER);
-      text(isSafeObject() ? "+" : "X", x+w/2, y-h/2);
+      text(isSafeObject() ? "+" : "X", w/2, -h/2);
     }
+
+    popMatrix();
   }
 
   void drawPacket() {
@@ -180,15 +185,15 @@ class NetworkObject extends GameEntity {
     fill(bg);
     stroke(0, 180, 255);
     strokeWeight(1);
-    rect(x-w/2, y-h/2, w, h, 4);
+    rect(-w/2, -h/2, w, h, 4);
     fill(180, 220, 255);
     textSize(11);
     textAlign(CENTER, CENTER);
     noStroke();
-    text(id, x, y-5);
+    text(id, 0, -5);
     fill(0, 140, 180, 130);
     textSize(7);
-    text("ID: "+id.substring(4), x, y+7);
+    text("ID: "+id.substring(4), 0, 7);
   }
 
   boolean isMouseOver() {
@@ -215,13 +220,16 @@ class VirusObject extends NetworkObject {
     super.display();
     // Show threat multiplier badge for dangerous viruses
     if (threatMultiplier > 1) {
+      pushMatrix();
+      translate(x, y);
       fill(255, 50, 50, 200);
       noStroke();
-      ellipse(x-w/2, y-h/2, 16, 16);
+      ellipse(-w/2, -h/2, 16, 16);
       fill(255);
       textSize(8);
       textAlign(CENTER, CENTER);
-      text("x"+threatMultiplier, x-w/2, y-h/2);
+      text("x"+threatMultiplier, -w/2, -h/2);
+      popMatrix();
     }
   }
 }
