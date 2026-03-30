@@ -1,4 +1,3 @@
-// GameplaySystem.pde - Version 1 
 // FSM states
 final int STATE_SPAWNING = 0;
 final int STATE_SCANNING = 1;
