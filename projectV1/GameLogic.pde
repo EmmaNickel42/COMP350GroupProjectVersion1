@@ -10,26 +10,27 @@
 
 // ================= SCAN DECISION LOGIC =================
 // Determines what kind of object is selected and returns a message
-String scanSelectedObject() {
+String scanSelectedObject(NetworkObject obj) {
 
-  if (selectedObj == null) {
+  // If nothing is selected, return a default message
+  if (obj == null) {
     return "No object selected.";
   }
 
-  selectedObj.scanned = true;
+  obj.scanned = true;
 
-  if (selectedObj.type.equals("virus")) {
+  if (obj.type.equals("virus")) {
     return "Threat detected: virus.";
-  } else if (selectedObj.type.equals("packet")) {
-    if (selectedObj.isSafe) {
+  } else if (obj.type.equals("packet")) {
+    if (obj.isSafe) {
       return "Safe packet detected.";
     } else {
       return "Unsafe packet detected.";
     }
-  } else if (selectedObj.type.equals("powerup")) {
-    if (selectedObj.powerType.equals("slow")) {
+  } else if (obj.type.equals("powerup")) {
+    if (obj.powerType.equals("slow")) {
       return "Powerup detected: slow.";
-    } else if (selectedObj.powerType.equals("blast")) {
+    } else if (obj.powerType.equals("blast")) {
       return "Powerup detected: blast.";
     }
   }

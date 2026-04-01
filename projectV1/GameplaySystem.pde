@@ -7,6 +7,7 @@ int gameState = STATE_SPAWNING;
 
 ArrayList<NetworkObject> objects;
 NetworkObject selectedObj = null;
+NetworkObject scanningObj = null;
 
 int serverHealth  = 100;
 int reputation    = 50;
@@ -280,6 +281,7 @@ void resetGameplaySystem() {
   objects.clear();
   scanStack.clear();
   selectedObj     = null;
+  scanningObj     = null;
   serverHealth    = 100;
   reputation      = 50;
   threatMeter     = 0;
@@ -336,7 +338,7 @@ void drawGameplay() {
   for (int i = objects.size()-1; i >= 0; i--) {
     NetworkObject obj = objects.get(i);
 
-    if (obj != selectedObj) {
+    if (obj != selectedObj && obj != scanningObj) {
       obj.move(speedMult); // noise() inside move()
       obj.trackPosition(); // track in static array
     }
@@ -347,7 +349,7 @@ void drawGameplay() {
     if (frameCount % 60 == 0) logObjectPosition(obj);
 
     // Reached server on its own
-    if (obj.x > serverZoneX && obj != selectedObj) {
+    if (obj.x > serverZoneX && obj != selectedObj && obj != scanningObj) {
       handleObjectReachedServer(obj);
       objects.remove(i);
     }
@@ -429,12 +431,13 @@ float[] getSortedTrackedX() {
 
 // Mouse interaction
 void gameMousePressed() {
-  if (isScanning) {
-    return;
-  }
-
   for (int i = objects.size() - 1; i >= 0; i--) { // for loop
     NetworkObject obj = objects.get(i);
+    
+    if (isScanning && obj == scanningObj) {
+      continue;
+    }
+    
     if (obj.isMouseOver()) {
       if (obj.type.equals("powerup")) {
         selectedObj = obj;
@@ -460,8 +463,6 @@ void gameKeyPressed() {
 }
 
 void gameDragged() {
-  if (isScanning) return;
-  
   if (selectedObj != null) {
     selectedObj.x = mouseX + dragOffsetX;
     selectedObj.y = mouseY + dragOffsetY;
@@ -473,11 +474,17 @@ void gameReleased() {
 
   if (isInZone(selectedObj.x, selectedObj.y, scannerX, scannerY, scannerW, scannerH)) {
     if (!isScanning) {
+      scanningObj = selectedObj;
       isScanning    = true;
       scanStartTime = millis();
-      selectedObj.x = scannerX + scannerW / 2;
-      selectedObj.y = scannerY + scannerH / 2;
+      scanningObj.x = scannerX + scannerW / 2;
+      scanningObj.y = scannerY + scannerH / 2;
       stackPush(selectedObj); // stack push
+      selectedObj = null;
+      return;
+    }
+    else {
+      selectedObj = null;
       return;
     }
   } 
@@ -487,14 +494,11 @@ void gameReleased() {
       incinEffectStart = millis();
     }
     burnSelectedObject();
-    isScanning  = false;
-    selectedObj = null;
   } 
   else if (isInZone(selectedObj.x, selectedObj.y, serverZoneX, serverZoneY, serverZoneW, serverZoneH)) {
     handleObjectReachedServer(selectedObj);
     objects.remove(selectedObj);
     selectedObj = null;
-    isScanning  = false;
   } 
   else {
     selectedObj = null;
@@ -503,17 +507,17 @@ void gameReleased() {
 
 // SCAN COMPLETION
 void checkScanComplete() {
-  if (!isScanning || selectedObj == null) return;
+  if (!isScanning || scanningObj == null) return;
 
   if (millis() - scanStartTime >= scanDuration) {
-    String result = scanSelectedObject();
-    selectedObj.scanned = true;
-    selectedObj.scanResult = result;
-    selectedObj.showScanResult = true;
+    String result = scanSelectedObject(scanningObj);
+    scanningObj.scanned = true;
+    scanningObj.scanResult = result;
+    scanningObj.showScanResult = true;
 
     stackPop(); // stack pop
     isScanning = false;
-    selectedObj = null;
+    scanningObj = null;
   }
 }
 
